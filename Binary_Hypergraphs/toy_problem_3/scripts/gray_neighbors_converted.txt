@@ -1,0 +1,49 @@
+   CX neighbors		--after converting from gray to binary--	Gray-decoded neighbors
+[0, 31, 15, 7, 3, 1]							[0, 16, 8, 4, 2, 1]
+[1, 30, 14, 6, 2, 0]							[1, 17, 9, 5, 3, 0]
+[2, 29, 13, 5, 1, 3]							[3, 19, 11, 7, 1, 2]
+[3, 28, 12, 4, 0, 2]							[2, 18, 10, 6, 0, 3]
+[4, 27, 11, 3, 7, 5]							[6, 22, 14, 2, 4, 7]
+[5, 26, 10, 2, 6, 4]							[7, 23, 15, 3, 5, 6]
+[6, 25, 9, 1, 5, 7]							[5, 21, 13, 1, 7, 4]
+[7, 24, 8, 0, 4, 6]							[4, 20, 12, 0, 6, 5]
+[8, 23, 7, 15, 11, 9]							[12, 28, 4, 8, 14, 13]
+[9, 22, 6, 14, 10, 8]							[13, 29, 5, 9, 15, 12]
+[10, 21, 5, 13, 9, 11]							[15, 31, 7, 11, 13, 14]
+[11, 20, 4, 12, 8, 10]							[14, 30, 6, 10, 12, 15]
+[12, 19, 3, 11, 15, 13]							[10, 26, 2, 14, 8, 11]
+[13, 18, 2, 10, 14, 12]							[11, 27, 3, 15, 9, 10]
+[14, 17, 1, 9, 13, 15]							[9, 25, 1, 13, 11, 8]
+[15, 16, 0, 8, 12, 14]							[8, 24, 0, 12, 10, 9]
+[16, 15, 31, 23, 19, 17]						[24, 8, 16, 28, 26, 25]
+[17, 14, 30, 22, 18, 16]						[25, 9, 17, 29, 27, 24]
+[18, 13, 29, 21, 17, 19]						[27, 11, 19, 31, 25, 26]
+[19, 12, 28, 20, 16, 18]						[26, 10, 18, 30, 24, 27]
+[20, 11, 27, 19, 23, 21]						[30, 14, 22, 26, 28, 31]
+[21, 10, 26, 18, 22, 20]						[31, 15, 23, 27, 29, 30]
+[22, 9, 25, 17, 21, 23]							[29, 13, 21, 25, 31, 28]
+[23, 8, 24, 16, 20, 22]							[28, 12, 20, 24, 30, 29]
+[24, 7, 23, 31, 27, 25]							[20, 4, 28, 16, 22, 21]
+[25, 6, 22, 30, 26, 24]							[21, 5, 29, 17, 23, 20]
+[26, 5, 21, 29, 25, 27]							[23, 7, 31, 19, 21, 22]
+[27, 4, 20, 28, 24, 26]							[22, 6, 30, 18, 20, 23]
+[28, 3, 19, 27, 31, 29]							[18, 2, 26, 22, 16, 19]
+[29, 2, 18, 26, 30, 28]							[19, 3, 27, 23, 17, 18]
+[30, 1, 17, 25, 29, 31]							[17, 1, 25, 21, 19, 16]
+[31, 0, 16, 24, 28, 30]							[16, 0, 24, 20, 18, 17]
+
+
+...seems that Complementary Crossover operator is, indeed, isomorphic to Single Bit Flip operator
+with gray encoding function being the mapping from SBC to CX.
+
+Yet, the steepest ascent networks of the two landscapes are very different, and number of optima
+is not preserved.
+
+What if I performed single bit flip on a Gray encoded landscape? (Do this - should show it to be same as CX operator landscape)
+
+
+
+---IDEAS ABOUT ISOMORPHISM AND OPTIMA---
+which means they are isomorphic, but optima would only be conserved on a problem that doesn't consider conversion of bits to another value, e.g. Onemax problem, Royal Road, etc.
+
+when the representation of the bits correlates to values and those values matter for fitness, then the isomporphism would not, necessarily, preserve optima.

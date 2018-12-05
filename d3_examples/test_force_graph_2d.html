@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  #header {
+    position: fixed;
+    left: 1%;
+    right: 22%;
+    top: 0px;
+    bottom: 0px;
+    height: 10%;
+  }
+  #workspace {
+    position: fixed;
+    left: 1%;
+    right: 22%;
+    top: 10%;
+    bottom: 0px;
+  }
+  #control_panel {
+    position: fixed;
+    left: 78%;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    width: 22%;
+    outline-style: solid;
+  }
+  .boop_container1 {
+    position: fixed;
+    top: 2%;
+    left: 79%;
+    height: 10%;
+  }
+  .boop_container2 {
+    position: fixed;
+    top: 12%;
+    left: 79%;
+    height: 20%;
+  }
+  .boop_container3 {
+    position: fixed;
+    top: 29%;
+    left: 79%;
+    height: 34%;
+  }
+  .boop_container4 {
+    position: fixed;
+    top: 69%;
+    left: 79%;
+    height: 30%;
+  }
+  .boop1 {
+    height: 25%;
+    width: 45%;
+  }
+  .boop2 {
+    height: 25%;
+    width: 45%;
+  }
+  .boop3 {
+    height: 25%;
+    width: 95%;
+  }
+</style>
+
+<body>
+  <div id="control_panel">
+    <div class="boop_container1">
+      <h3>Workspace Layout:</h3>
+      <button class="boop1">boop</button>
+      <button class="boop1">boop</button>
+    </div>
+    <div class="boop_container2">
+      <h3>Color:</h3>
+      <button class="boop2" onClick="node_color_button()">node_color_boop</button>
+      <button class="boop2">boop</button>
+      <button class="boop2">boop</button>
+      <button class="boop2">boop</button>
+    </div>
+    <div class="boop_container3">
+      <h3>Graph Appearance:</h3>
+      <button class="boop2">boop</button>
+      <button class="boop2">boop</button>
+      <button class="boop2">boop</button>
+      <button class="boop2">boop</button>
+      <button class="boop2">boop</button>
+      <button class="boop2">boop</button>
+      <button class="boop2">boop</button>
+      <button class="boop2">boop</button>
+    </div>
+    <div class="boop_container4">
+      <h3>Something Else:</h3>
+      <button class="boop3">boop</button>
+      <button class="boop3">boop</button>
+      <button class="boop3">boop</button>
+    </div>
+  </div>
+  <div id="header">
+    <h2>Add landscape to display:</h2>
+    <input type="file" id="file-input"/>
+  </div>
+  <div id="workspace"></div>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <script>
+
+    var workspaceDiv = document.getElementById("workspace");
+    var width = workspaceDiv.clientWidth - 1;
+    var height = workspaceDiv.clientHeight - 1;
+
+    var num_landscapes = 0;
+    var color_array = ["Red","Orange","Yellow","Green","Blue","Purple","White"];
+    var color_index = 0;
+    var svg_list = {};
+
+    function addExperiment(fileEvent){
+      if (fileEvent.target.files[0] && !(fileEvent.target.files[0].name in svg_list)){
+        num_landscapes += 1;
+        add_new_svg(fileEvent.target.files[0].name);
+        add_landscape(fileEvent.target.files[0].name);
+      }
+    }
+
+//  var zoom = d3.zoom()
+//    .scaleExtent([1, 40])
+//    .translateExtent([[-100, -100], [width + 90, height + 100]])
+//    .on("zoom", zoomed);
+
+//  var view = svg1.append("rect")
+//    .attr("class", "view")
+//    .attr("x", 0.5)
+//    .attr("y", 0.5)
+//    .attr("width", width - 1)
+//    .attr("height", height - 1);
+
+//  svg1.call(zoom);
+
+//  function zoomed() {
+//    view.attr("transform", d3.event.transform);
+//  gX.call(xAxis.scale(d3.event.transform.rescaleX(x)));
+//  gY.call(yAxis.scale(d3.event.transform.rescaleY(y)));
+//  }
+
+    function add_new_svg(file_name){
+      svg_list[file_name] = d3.select(workspaceDiv)
+        .append("svg")
+        .attr("id", file_name)
+        .attr("width", width)
+        .attr("height", height)
+        .attr("viewBox", [-width/8, -height/8, width/4, height/4])
+        .call(d3.zoom().on("zoom", function () {
+          svg_list[file_name].attr("transform", "translate(" + d3.event.transform.x + ", " + d3.event.transform.y + ")" + " scale(" + d3.event.transform.k + ")")
+        }))
+        .append("g");
+    }
+
+
+    function add_landscape(file_name){
+//      d3.json("./toy_problem_2/" + file_name).then(function(data){
+      d3.json("./knapsack_problem/" + file_name).then(function(data){
+
+        const links = data.links.map(d => Object.create(d));
+        const nodes = data.nodes.map(d => Object.create(d));
+        const simulation = forceSimulation(nodes, links)
+			.force("charge", d3.forceManyBody().strength(-150))
+			.on("tick", ticked);
+
+        const link = svg_list[file_name].append("g")
+          .attr("stroke", "#333")
+          .selectAll("line")
+          .data(links)
+          .enter().append("line")
+          .attr("stroke-opacity", function(d) {return d.fit_val})
+          .attr("stroke-width", function(d) {return d.eigen_val});
+
+        const node = svg_list[file_name].append("g")
+          .attr("stroke", "#000")
+          .attr("stroke-width", 0.6)
+          .selectAll("circle")
+          .data(nodes)
+          .enter().append("circle")
+          .attr("r", 8)
+          .attr("fill", function(d) { return d3.interpolateRdYlBu(1-d.fitness); })
+          .call(drag(simulation));
+
+        node.append("title")
+          .text(d => d.id);
+
+        function ticked() {
+          link
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y);
+    
+          node
+            .attr("cx", d => d.x)
+            .attr("cy", d => d.y);
+        }
+      });
+    }
+
+    function forceSimulation(nodes, links) {
+      return d3.forceSimulation(nodes)
+          .force("link", d3.forceLink(links).id(d => d.id))
+          .force("charge", d3.forceManyBody())
+          .force("x", d3.forceX())
+          .force("y", d3.forceY());
+    }
+
+    drag = simulation => {
+
+      function dragstarted(d) {
+        if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      }
+  
+      function dragged(d) {
+        d.fx = d3.event.x;
+        d.fy = d3.event.y;
+      }
+  
+      function dragended(d) {
+        if (!d3.event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      }
+  
+      return d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended);
+    }
+
+    function node_color_button(){
+      points = document.getElementsByTagName("circle");
+      var i, new_color;
+      new_color = cycle_color();
+      for (i = 0; i < points.length; i++) {
+        points[i].style.fill = new_color;
+        //points[i].style.fill = cycle_color(); //party_button!!
+      }
+    }
+
+    function cycle_color(){
+      color_index = (color_index+1) % 7;
+      return color_array[color_index];
+    }
+
+    document.getElementById('file-input')
+      .addEventListener('change', addExperiment, false);
+
+  </script>
+

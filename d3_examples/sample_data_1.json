@@ -1,0 +1,21 @@
+{
+"nodes": [
+  {"id":1, "group":1, "radius":2},
+  {"id":2, "group":2, "radius":3},
+  {"id":3, "group":3, "radius":2},
+  {"id":4, "group":4, "radius":4},
+  {"id":5, "group":5, "radius":2},
+  {"id":6, "group":6, "radius":3}
+  ],
+"links": [
+  {"source":1,"target":2,"value":4},
+  {"source":2,"target":4,"value":3},
+  {"source":4,"target":3,"value":4},
+  {"source":2,"target":5,"value":2},
+  {"source":3,"target":6,"value":3},
+  {"source":1,"target":5,"value":4},
+  {"source":4,"target":1,"value":3},
+  {"source":4,"target":5,"value":3},
+  {"source":2,"target":6,"value":2}
+  ]
+}
