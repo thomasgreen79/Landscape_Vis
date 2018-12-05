@@ -156,7 +156,8 @@
 
     function add_landscape(file_name){
 //      d3.json("./toy_problem_2/" + file_name).then(function(data){
-      d3.json("./knapsack_problem/" + file_name).then(function(data){
+//      d3.json("./knapsack_problem/" + file_name).then(function(data){
+      d3.json("./nk_problem/" + file_name).then(function(data){
 
         const links = data.links.map(d => Object.create(d));
         const nodes = data.nodes.map(d => Object.create(d));
