@@ -175,12 +175,12 @@
 
         const node = svg_list[file_name].append("g")
           .attr("stroke", "#000")
-          .attr("stroke-width", 0.6)
           .selectAll("circle")
           .data(nodes)
           .enter().append("circle")
-          .attr("r", 8)
-          .attr("fill", function(d) { return d3.interpolateRdYlBu(1-d.fitness); })
+          .attr("stroke-width", function(d) {if (d.is_peak === "True") return 2; else return 0.6})
+          .attr("r", function(d) {if (d.is_peak === "True") return 20; else return 8})
+          .attr("fill", function(d) { if (d.is_peak === "True") return "Yellow"; else return d3.interpolateRdYlBu(1-d.fitness); })
           .call(drag(simulation));
 
         node.append("title")
