@@ -106,8 +106,14 @@
     var workspaceDiv = document.getElementById("workspace");
     var width = workspaceDiv.clientWidth - 1;
     var height = workspaceDiv.clientHeight - 1;
+    var svg_width = width;
+    var svg_height = height;
+    var link_width = 1;
+    var node_scale = 4;
 
     var num_landscapes = 0;
+    var n_cols = 1;
+    var n_rows = 1;
     var color_array = ["Red","Orange","Yellow","Green","Blue","Purple","White"];
     var color_index = 0;
     var svg_list = {};
@@ -115,38 +121,40 @@
     function addExperiment(fileEvent){
       if (fileEvent.target.files[0] && !(fileEvent.target.files[0].name in svg_list)){
         num_landscapes += 1;
+        n_cols = Math.ceil(Math.sqrt(num_landscapes));
+        n_rows = Math.ceil(num_landscapes/n_cols);
+        svg_width = width/n_cols;
+        svg_height = height/n_rows;
+
+        update_existing_svgs();
         add_new_svg(fileEvent.target.files[0].name);
         add_landscape(fileEvent.target.files[0].name);
       }
     }
 
-//  var zoom = d3.zoom()
-//    .scaleExtent([1, 40])
-//    .translateExtent([[-100, -100], [width + 90, height + 100]])
-//    .on("zoom", zoomed);
+/*
+ Zoom code cut from here.
+*/
 
-//  var view = svg1.append("rect")
-//    .attr("class", "view")
-//    .attr("x", 0.5)
-//    .attr("y", 0.5)
-//    .attr("width", width - 1)
-//    .attr("height", height - 1);
-
-//  svg1.call(zoom);
-
-//  function zoomed() {
-//    view.attr("transform", d3.event.transform);
-//  gX.call(xAxis.scale(d3.event.transform.rescaleX(x)));
-//  gY.call(yAxis.scale(d3.event.transform.rescaleY(y)));
-//  }
+    function update_existing_svgs(){
+      if (Object.keys(svg_list).length == 0){
+        return;
+      }
+      for (svg in svg_list){
+//        console.log(svg_list[svg]);
+        document.getElementById(svg).setAttribute("width", svg_width);
+        document.getElementById(svg).setAttribute("height", svg_height);
+      }
+    }
 
     function add_new_svg(file_name){
       svg_list[file_name] = d3.select(workspaceDiv)
         .append("svg")
         .attr("id", file_name)
-        .attr("width", width)
-        .attr("height", height)
-        .attr("viewBox", [-width/8, -height/8, width/4, height/4])
+        .attr("width", svg_width)
+        .attr("height", svg_height)
+//        .attr("viewBox", [-width/8, -height/8, 4*width, 4*height])
+        .attr("viewBox", [0, 0, 24*width, 24*height])
         .call(d3.zoom().on("zoom", function () {
           svg_list[file_name].attr("transform", "translate(" + d3.event.transform.x + ", " + d3.event.transform.y + ")" + " scale(" + d3.event.transform.k + ")")
         }))
@@ -162,24 +170,24 @@
         const links = data.links.map(d => Object.create(d));
         const nodes = data.nodes.map(d => Object.create(d));
         const simulation = forceSimulation(nodes, links)
-			.force("charge", d3.forceManyBody().strength(-150))
+			.force("charge", d3.forceManyBody().strength(-10000))
 			.on("tick", ticked);
 
         const link = svg_list[file_name].append("g")
-          .attr("stroke", "#333")
+          .attr("stroke", "#111")
           .selectAll("line")
           .data(links)
           .enter().append("line")
           .attr("stroke-opacity", function(d) {return d.fit_val})
-          .attr("stroke-width", function(d) {return d.eigen_val});
+          .attr("stroke-width", function(d) {return link_width*d.eigen_val*Math.sqrt(d.eigen_val)});
 
         const node = svg_list[file_name].append("g")
           .attr("stroke", "#000")
           .selectAll("circle")
           .data(nodes)
           .enter().append("circle")
-          .attr("stroke-width", function(d) {if (d.is_peak === "True") return 2; else return 0.6})
-          .attr("r", function(d) {if (d.is_peak === "True") return 20; else return 8})
+          .attr("stroke-width", function(d) {if (d.is_peak === "True") return node_scale*2; else return node_scale*0.6})
+          .attr("r", function(d) {if (d.is_peak === "True") return node_scale*24; else return node_scale*8})
           .attr("fill", function(d) { if (d.is_peak === "True") return "Yellow"; else return d3.interpolateRdYlBu(1-d.fitness); })
           .call(drag(simulation));
 
@@ -251,5 +259,24 @@
     document.getElementById('file-input')
       .addEventListener('change', addExperiment, false);
 
+//  var zoom = d3.zoom()
+//    .scaleExtent([1, 40])
+//    .translateExtent([[-100, -100], [width + 90, height + 100]])
+//    .on("zoom", zoomed);
+
+//  var view = svg1.append("rect")
+//    .attr("class", "view")
+//    .attr("x", 0.5)
+//    .attr("y", 0.5)
+//    .attr("width", width - 1)
+//    .attr("height", height - 1);
+
+//  svg1.call(zoom);
+
+//  function zoomed() {
+//    view.attr("transform", d3.event.transform);
+//  gX.call(xAxis.scale(d3.event.transform.rescaleX(x)));
+//  gY.call(yAxis.scale(d3.event.transform.rescaleY(y)));
+//  }
   </script>
 

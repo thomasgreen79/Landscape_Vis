@@ -3,6 +3,10 @@
 <style>
 </style>
 <body>
+  <div id="header">
+    <h2>Add landscape to display:</h2>
+    <input type="file" id="file-input"/>
+  </div>
   <div id="3d-graph"></div>
 <script src="//unpkg.com/3d-force-graph"></script>
 <script>
@@ -8211,7 +8215,7 @@
       .linkColor("black")
       .linkOpacity(0.4)
       .dagMode("bu")
-      .dagLevelDistance(100)
+      .dagLevelDistance(150)
       .graphData(gData);
 //    .jsonUrl("file:///home/thomasgreen79/BSU_Research/Thesis_research/Landscape_Visualization/d3_examples/toy_problem_2/toy_2_5_bit_cx_SAN.json");
 </script>
