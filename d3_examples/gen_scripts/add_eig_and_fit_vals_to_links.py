@@ -17,7 +17,6 @@ edges = dict()
 
 #*************************************************************************
 #Variables
-#max_fitness = 0.7615309387621979
 max_fitness = 0.0
 
 
@@ -64,7 +63,7 @@ for i in range(0,len(parsed_json["links"])):
 '''
 
 '''Write nodes and links to landscape file'''
-out_ls_write.write(node_string)
+out_ls_write.write(node_string[0:len(node_string)-2])
 #json.dump(parsed_json, out_ls_write)
 
 out_ls_write.write(",\n\"links\": [\n")
