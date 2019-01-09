@@ -1,15 +1,30 @@
 import sys, json
 
-orig_filename = sys.argv[1]
-new_filename = sys.argv[2]
+#Setup
+#*************************************************************************
+input_nodes_json_filename = sys.argv[1]
+input_network_filename = sys.argv[2]
+output_landscape_filename = sys.argv[3]
 
-fr = open(orig_filename, "r")
-fw = open(new_filename, "w")
+in_nj_read = open(input_nodes_json_filename, "r")
+in_net_read = open(input_network_filename, "r")
+out_ls_write = open(output_landscape_filename, "w")
 
+node_string = in_nj_read.read().replace('\n', '\n')
 nodes = dict()
 edges = dict()
+
+
+#*************************************************************************
+#Variables
+#max_fitness = 0.7615309387621979
 max_fitness = 0.0
 
+
+#*************************************************************************
+#Methods
+
+#*************************************************************************
 def calc_edge_fit_val(source, target):
   return max(float(nodes[source][0]), float(nodes[target][0]))/max_fitness
 
@@ -17,8 +32,13 @@ def calc_edge_eigen_val(source, target):
   return min(max(float(nodes[source][1]), float(nodes[target][1]))*10, 10)
 
 
-'''Read JSON and setup nodes dictionary with all values'''
-file_string = fr.read()
+#*************************************************************************
+#Script_Code
+
+#*************************************************************************
+'''Read data into memory'''
+#file_string = in_nj_read.read()
+file_string = node_string
 parsed_json = json.loads(file_string)
 for i in range(0,len(parsed_json["nodes"])):
   node = parsed_json["nodes"][i]
@@ -26,14 +46,38 @@ for i in range(0,len(parsed_json["nodes"])):
   if float(node["fitness"]) > max_fitness:
     max_fitness = float(node["fitness"])
 
+for line in in_net_read:
+  node_pair = line.strip().split(';')
+  edge = (node_pair[0], node_pair[1])
+  if edge in edges:
+    continue
+  else:
+    edges[edge] = (calc_edge_fit_val(edge[0], edge[1]), calc_edge_eigen_val(edge[0], edge[1]))
+
+
+'''
 for i in range(0,len(parsed_json["links"])):
   edge = parsed_json["links"][i]
   source = edge["source"]
   target = edge["target"]
   edges[(source, target)] = (calc_edge_fit_val(source, target), calc_edge_eigen_val(source, target))
+'''
 
+'''Write nodes and links to landscape file'''
+out_ls_write.write(node_string)
+#json.dump(parsed_json, out_ls_write)
 
-'''Use values to write new JSON file with added eigen_val and fit_val for each edge'''
+out_ls_write.write(",\n\"links\": [\n")
+i = 0
+for key in edges:
+  out_ls_write.write("{\"source\":\"" + key[0] + "\", \"target\":\"" + key[1] + "\", \"fit_val\":\"" + str(edges[key][0]) + "\", \"eigen_val\":\"" + str(edges[key][1]) + "\"}")
+  if i < len(edges)-1:
+    out_ls_write.write(",\n")
+  else:
+    out_ls_write.write("\n")
+  i += 1
+out_ls_write.write("]\n}\n")
+'''
 fw.write("{\n\"nodes\": [\n")
 i = 0
 for key in nodes:
@@ -43,14 +87,4 @@ for key in nodes:
   else:
     fw.write("\n")
   i += 1
-
-fw.write("],\n\"links\": [\n")
-i = 0
-for key in edges:
-  fw.write("{\"source\":\"" + key[0] + "\", \"target\":\"" + key[1] + "\", \"fit_val\":\"" + str(edges[key][0]) + "\", \"eigen_val\":\"" + str(edges[key][1]) + "\"}")
-  if i < len(edges)-1:
-    fw.write(",\n")
-  else:
-    fw.write("\n")
-  i += 1
-fw.write("]\n}\n")
+'''

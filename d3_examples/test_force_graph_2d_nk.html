@@ -106,6 +106,9 @@
     var workspaceDiv = document.getElementById("workspace");
     var width = workspaceDiv.clientWidth - 1;
     var height = workspaceDiv.clientHeight - 1;
+    var link_width = 5;
+    var node_scale = 8;
+
 
     var num_landscapes = 0;
     var color_array = ["Red","Orange","Yellow","Green","Blue","Purple","White"];
@@ -162,24 +165,25 @@
         const links = data.links.map(d => Object.create(d));
         const nodes = data.nodes.map(d => Object.create(d));
         const simulation = forceSimulation(nodes, links)
-			.force("charge", d3.forceManyBody().strength(-150))
+			.force("charge", d3.forceManyBody().strength(-2000))
 			.on("tick", ticked);
 
         const link = svg_list[file_name].append("g")
-          .attr("stroke", "#333")
+          .attr("stroke", "#111")
           .selectAll("line")
           .data(links)
           .enter().append("line")
           .attr("stroke-opacity", function(d) {return d.fit_val})
-          .attr("stroke-width", function(d) {return d.eigen_val});
+          .attr("stroke-width", function(d) {return link_width*d.eigen_val});
+//          .attr("stroke-width", function(d) {return d.eigen_val});
 
         const node = svg_list[file_name].append("g")
           .attr("stroke", "#000")
           .selectAll("circle")
           .data(nodes)
           .enter().append("circle")
-          .attr("stroke-width", function(d) {if (d.is_peak === "True") return 2; else return 0.6})
-          .attr("r", function(d) {if (d.is_peak === "True") return 20; else return 8})
+          .attr("stroke-width", function(d) {if (d.is_peak === "True") return node_scale*2; else return node_scale*0.6})
+          .attr("r", function(d) {if (d.is_peak === "True") return node_scale*24; else return node_scale*8})
           .attr("fill", function(d) { if (d.is_peak === "True") return "Yellow"; else return d3.interpolateRdYlBu(1-d.fitness); })
           .call(drag(simulation));
 
