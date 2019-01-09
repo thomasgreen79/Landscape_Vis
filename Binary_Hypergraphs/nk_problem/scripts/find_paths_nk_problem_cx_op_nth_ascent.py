@@ -1,27 +1,35 @@
+'''
+Using an N,K problem search space, find the nth biggest ascent of an sbc operator from every point in the landscape and write
+links of the resulting network to an output network csv file and the
+fitnesses of every node to an output fitness csv file.
+'''
+
 import sys
 import numpy as np
 from numpy import random
 
 np.random.seed(19)
 
-if len(sys.argv) < 4:
-  print("Usage: python find_paths_nk_problem_sbc_op.py <N> <K> <network_output_filename.csv> <fitness_output_filenam.csv>")
+if len(sys.argv) < 5:
+  print("Usage: python find_paths_nk_problem_sbc_op.py <N> <K> <nth rank> <network_output_filename.csv> <fitness_output_filenam.csv>")
   sys.exit(0)
-
 
 N = int(sys.argv[1])
 K = int(sys.argv[2])
+n = int(sys.argv[3])
+
+if n < 1 or n > N:
+  print("Nth Ascent ranking must be between 1 and the number of neighbors (inclusive)")
+  sys.exit()
+
 num_points = 2**N
 
-SAN_file_name = sys.argv[3]
-fit_file_name = sys.argv[4]
+SAN_file_name = sys.argv[4]
+fit_file_name = sys.argv[5]
 
 SAN_write = open(SAN_file_name, "w")
 fit_write = open(fit_file_name, "w")
 fit_write.write("id,fitness\n")
-
-contrs = {}
-fit_mem = {}
 
 
 def gen_contrs(n, k):
@@ -52,17 +60,42 @@ def int2bits(k, N):
   x = [0]*pad + x
   return x
 
-def flip_bit(value, bit_index):
-  value ^= (1 << bit_index)
-  return value
+def build_string(k_val):
+  bin = ''
+  for i in range(0, N):
+    if i < k_val:
+      bin += '0'
+    else:
+      bin += '1'
+  return bin
+
+def cx_op(value, k_val):
+  return value ^ int(build_string(k_val), 2)
 
 def get_neighbors(vert_id, num_neighbors):
   neighbors = list()
   neighbors.append(vert_id)
   for i in range(0,num_neighbors):
-    neighbors.append(flip_bit(vert_id, i))
+    neighbors.append(cx_op(vert_id, i))
   return neighbors
 
+'''Choose the nth biggest neighbor where n ranges from 1 to num neighbors'''
+def get_nth_ascent(neighbors, n):
+  neighbors_descending = list()
+  for i in range(0, len(neighbors)):
+    score = fitness(np.array(int2bits(neighbors[i], N), dtype=bool), contrs, fit_mem)
+    scored_neighbor = (neighbors[i], score)
+    j = 0
+    while j < len(neighbors_descending):
+      if scored_neighbor[1] < neighbors_descending[j][1]:
+        j += 1
+      else:
+        break
+    neighbors_descending.insert(j, scored_neighbor)
+  return neighbors_descending[n-1][0]
+
+
+'''
 def get_steepest_ascent(neighbors):
   max_ascent_index = -1
   max_ascent_value = -1
@@ -72,15 +105,17 @@ def get_steepest_ascent(neighbors):
       max_ascent_value = score
       max_ascent_index = i
   return neighbors[max_ascent_index]
-
-
+'''
 
 contrs = gen_contrs(N, K)
+fit_mem = {}
 
 max_num = -1
 max_fit = 0
+
 steps = list()
 all_fitnesses = list()
+
 for i in range(0,num_points):
   fit = fitness(np.array(int2bits(i, N), dtype=bool), contrs, fit_mem)
   all_fitnesses.append((i, fit))
@@ -89,8 +124,8 @@ for i in range(0,num_points):
     max_num = i
 
   neighbors = get_neighbors(i, N)
-  best_neighbor = get_steepest_ascent(neighbors)
-  edge = str(i) + ";" + str(best_neighbor)
+  nth_neighbor = get_nth_ascent(neighbors, n)
+  edge = str(i) + ";" + str(nth_neighbor)
   steps.append(edge)
   if i % 50000 == 0:
       print("Processed: " + str(i))
