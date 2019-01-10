@@ -2,6 +2,10 @@ import sys, json
 
 #Setup
 #*************************************************************************
+if len(sys.argv) < 4:
+  print("Usage: python add_eig_and_fit_vals_to_links.py <nodes_filename.json> <links_filename.csv> <output_landscape_filename.json>")
+  sys.exit(0)
+
 input_nodes_json_filename = sys.argv[1]
 input_network_filename = sys.argv[2]
 output_landscape_filename = sys.argv[3]

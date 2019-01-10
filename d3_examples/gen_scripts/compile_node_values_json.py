@@ -8,7 +8,7 @@ landscape visualization
 import sys
 
 if len(sys.argv) < 6:
-  print("Usage: python compile_json_values_nk_problem_20_bit.py <network_filename.csv> <fitness_filename.csv> <eigen_cents_filename.csv> <peaks_filename.csv> <output_filename.json>")
+  print("Usage: python compile_node_values_json.py <network_filename.csv> <fitness_filename.csv> <eigen_cents_filename.csv> <peaks_filename.csv> <output_filename.json>")
   sys.exit(0)
 
 net_filename = sys.argv[1]
