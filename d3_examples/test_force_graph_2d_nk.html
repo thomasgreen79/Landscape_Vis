@@ -160,16 +160,16 @@
     function add_landscape(file_name){
 //      d3.json("./toy_problem_2/" + file_name).then(function(data){
 //      d3.json("./knapsack_problem/" + file_name).then(function(data){
-      d3.json("./nk_problem/" + file_name).then(function(data){
+      d3.json("./nk_problem/data/" + file_name).then(function(data){
 
         const links = data.links.map(d => Object.create(d));
         const nodes = data.nodes.map(d => Object.create(d));
         const simulation = forceSimulation(nodes, links)
-			.force("charge", d3.forceManyBody().strength(-2000))
+			.force("charge", d3.forceManyBody().strength(-12000))
 			.on("tick", ticked);
 
         const link = svg_list[file_name].append("g")
-          .attr("stroke", "#111")
+          .attr("stroke", "rgb" + function(d) {var color = select_boa_color(parseInt(d.boa_index, 10); console.log(color); return color;)})
           .selectAll("line")
           .data(links)
           .enter().append("line")
@@ -235,6 +235,36 @@
         .on("start", dragstarted)
         .on("drag", dragged)
         .on("end", dragended);
+    }
+
+    function select_boa_color(index){
+      rgb_val = (0, 0, 0);
+      if (index < 0) {
+        return rgb_val;
+      } else if (index < 48) {
+        color_index = index/16;
+	tint_factor = index%16;
+	rgb_val[color_index] = 255-tint_factor*12;
+      } else {
+        two_color_index = (index - 48) / 256;
+        two_color_tint_factor = (index - 48) % 256;
+	first_color_tint_factor = 255-two_color_tint_factor / 16;
+	second_color_tint_factor = 255-two_color_tint_factor % 16;
+        if (two_color_index == 0) {
+          rgb_val[0] = first_color_tint_factor*12;
+          rgb_val[1] = second_color_tint_factor*12;
+        } else if (two_color_index == 1) {
+          rgb_val[0] = first_color_tint_factor*12;
+          rgb_val[2] = second_color_tint_factor*12;
+        } else if (two_color_index == 2) {
+          rgb_val[1] = first_color_tint_factor*12;
+          rgb_val[2] = second_color_tint_factor*12;
+        } else {
+          console.log("Too many peaks!")
+        }
+      }
+      console.log(rgb_val);
+      return rgb_val;
     }
 
     function node_color_button(){
