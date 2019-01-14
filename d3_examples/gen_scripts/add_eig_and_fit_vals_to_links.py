@@ -8,15 +8,20 @@ if len(sys.argv) < 4:
 
 input_nodes_json_filename = sys.argv[1]
 input_network_filename = sys.argv[2]
+#input_boa_peaks_filename = sys.argv[3]
 output_landscape_filename = sys.argv[3]
 
 in_nj_read = open(input_nodes_json_filename, "r")
 in_net_read = open(input_network_filename, "r")
+#in_boa_read = open(input_boa_peaks_filename, "r")
 out_ls_write = open(output_landscape_filename, "w")
 
-node_string = in_nj_read.read().replace('\n', '\n')
+node_string = in_nj_read.read()
 nodes = dict()
 edges = dict()
+boa_peaks = dict()
+boa_indexes = dict()
+boa_index = 0
 
 
 #*************************************************************************
@@ -34,6 +39,11 @@ def calc_edge_fit_val(source, target):
 def calc_edge_eigen_val(source, target):
   return min(max(float(nodes[source][1]), float(nodes[target][1]))*10, 10)
 
+def calc_boa_peak_index(peak_1, peak_2):
+  if peak_1 == peak_2:
+    return boa_indexes[peak_1]
+  else:
+    return -1
 
 #*************************************************************************
 #Script_Code
@@ -43,11 +53,17 @@ def calc_edge_eigen_val(source, target):
 #file_string = in_nj_read.read()
 file_string = node_string
 parsed_json = json.loads(file_string)
+
 for i in range(0,len(parsed_json["nodes"])):
   node = parsed_json["nodes"][i]
   nodes[node["id"]] = (node["fitness"], node["eigen_cent"])
   if float(node["fitness"]) > max_fitness:
     max_fitness = float(node["fitness"])
+  boa_peaks[node["id"]] = node["boa_peak"]
+  if node["boa_peak"] not in boa_indexes:
+    boa_index += 1
+    boa_indexes[node["boa_peak"]] = boa_index
+
 
 for line in in_net_read:
   node_pair = line.strip().split(';')
@@ -55,7 +71,7 @@ for line in in_net_read:
   if edge in edges:
     continue
   else:
-    edges[edge] = (calc_edge_fit_val(edge[0], edge[1]), calc_edge_eigen_val(edge[0], edge[1]))
+    edges[edge] = (calc_edge_fit_val(edge[0], edge[1]), calc_edge_eigen_val(edge[0], edge[1]), calc_boa_peak_index(boa_peaks[edge[0]], boa_peaks[edge[1]]))
 
 
 '''
@@ -73,7 +89,7 @@ out_ls_write.write(node_string[0:len(node_string)-2])
 out_ls_write.write(",\n\"links\": [\n")
 i = 0
 for key in edges:
-  out_ls_write.write("{\"source\":\"" + key[0] + "\", \"target\":\"" + key[1] + "\", \"fit_val\":\"" + str(edges[key][0]) + "\", \"eigen_val\":\"" + str(edges[key][1]) + "\"}")
+  out_ls_write.write("{\"source\":\"" + key[0] + "\", \"target\":\"" + key[1] + "\", \"fit_val\":\"" + str(edges[key][0]) + "\", \"eigen_val\":\"" + str(edges[key][1]) + "\", \"boa_index\":\"" + str(edges[key][2]) + "\"}")
   if i < len(edges)-1:
     out_ls_write.write(",\n")
   else:
