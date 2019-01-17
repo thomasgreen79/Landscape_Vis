@@ -1,22 +1,29 @@
 '''
 Using an N,K problem search space, find the nth biggest ascent of an sbc operator from every point in the landscape and write
-links of the resulting network to an output network csv file and the
-fitnesses of every node to an output fitness csv file.
+links of the resulting network to an output network csv file,
+fitnesses of every node to an output fitness csv file,
+peaks of each Basin of Attraction from every node to an output BoA csv file,
+list of all peaks to an output peaks csv file.
+The Fitness Memory of points is either to be read in, if it exists, or written out if this is the first problem of these N,K values.
 '''
 
 import sys
 import numpy as np
 from numpy import random
+from ast import literal_eval as make_tuple
+from decimal import *
 
 np.random.seed(19)
 
-if len(sys.argv) < 7:
-  print("Usage: python find_paths_nk_problem_sbc_op.py <N> <K> <nth rank> <network_output_filename.csv> <fitness_output_filename.csv> <boa_peaks_filename.csv> <peaks_filename.txt>")
+if len(sys.argv) < 10:
+  print("Usage: python find_paths_nk_problem_sbc_op.py <N> <K> <nth rank> <network_output_filename.csv> <fitness_output_filename.csv> <boa_peaks_filename.csv> <peaks_filename.txt> <read or write: 'r' or 'w'> <fit_mem_filename.csv>")
   sys.exit(0)
 
 N = int(sys.argv[1])
 K = int(sys.argv[2])
 n = int(sys.argv[3])
+
+fit_mem = {}
 
 if n < 1 or n > N:
   print("Nth Ascent ranking must be between 1 and the number of neighbors (inclusive)")
@@ -37,6 +44,8 @@ SAN_file_name = sys.argv[4]
 fit_file_name = sys.argv[5]
 boa_peaks_file_name = sys.argv[6]
 peaks_file_name = sys.argv[7]
+read_or_write = sys.argv[8]
+fit_mem_file_name = sys.argv[9]
 
 SAN_write = open(SAN_file_name, "w")
 fit_write = open(fit_file_name, "w")
@@ -44,6 +53,31 @@ fit_write.write("id,fitness\n")
 boa_peaks_write = open(boa_peaks_file_name, "w")
 boa_peaks_write.write("id,boa_peak,boa_size\n")
 peaks_write = open(peaks_file_name, "w")
+fit_mem_process = None
+
+
+def read_fit_mem_from_file(fit_mem):
+  while True:
+    key_line = fit_mem_process.readline().strip()
+    value_line = fit_mem_process.readline().strip()
+    if not value_line:
+      break
+    fit_mem[make_tuple(key_line)] = float(value_line)
+
+def write_fit_mem_to_file():
+  for key in fit_mem:
+      fit_mem_process.write(str(key) + "\n" + str(Decimal(fit_mem[key])) + "\n")
+
+if read_or_write == "r":
+  getcontext().prec = 15
+  fit_mem_process = open(fit_mem_file_name, "r")
+  read_fit_mem_from_file(fit_mem)
+elif read_or_write == "w":
+  fit_mem_process = open(fit_mem_file_name, "w")
+else:
+  print("Fit mem file error message")
+  sys.exit(1)
+
 
 
 def gen_contrs(n, k):
@@ -132,8 +166,9 @@ def root(p):
     p = boa_uf[p]
   return p
 
+
+
 contrs = gen_contrs(N, K)
-fit_mem = {}
 
 max_num = -1
 max_fit = 0
@@ -190,6 +225,9 @@ for i in range(0, len(boa_uf)):
 for peak in peaks:
   peaks_write.write(str(peak) + "\n")
 
+if read_or_write is 'w':
+  write_fit_mem_to_file()
+  print(str(fit_mem))
 #print(peaks)
 
 print("max num is: " + str(max_num))
