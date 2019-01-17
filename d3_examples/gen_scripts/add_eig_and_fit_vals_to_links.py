@@ -37,11 +37,18 @@ def calc_edge_fit_val(source, target):
   return max(float(nodes[source][0]), float(nodes[target][0]))/max_fitness
 
 def calc_edge_eigen_val(source, target):
-  return min(max(float(nodes[source][1]), float(nodes[target][1]))*10, 10)
+  return min(((float(nodes[source][1]) + float(nodes[target][1]))/2)*20, 10)
+  #return min(max(float(nodes[source][1]), float(nodes[target][1]))*10, 10)
 
 def calc_boa_peak_index(peak_1, peak_2):
   if peak_1 == peak_2:
     return boa_indexes[peak_1]
+  else:
+    return -1
+
+def calc_boa_peak(peak_1, peak_2):
+  if peak_1 == peak_2:
+    return peak_1
   else:
     return -1
 
@@ -61,8 +68,8 @@ for i in range(0,len(parsed_json["nodes"])):
     max_fitness = float(node["fitness"])
   boa_peaks[node["id"]] = node["boa_peak"]
   if node["boa_peak"] not in boa_indexes:
-    boa_index += 1
     boa_indexes[node["boa_peak"]] = boa_index
+    boa_index += 1
 
 
 for line in in_net_read:
@@ -71,7 +78,7 @@ for line in in_net_read:
   if edge in edges:
     continue
   else:
-    edges[edge] = (calc_edge_fit_val(edge[0], edge[1]), calc_edge_eigen_val(edge[0], edge[1]), calc_boa_peak_index(boa_peaks[edge[0]], boa_peaks[edge[1]]))
+    edges[edge] = (calc_edge_fit_val(edge[0], edge[1]), calc_edge_eigen_val(edge[0], edge[1]), calc_boa_peak_index(boa_peaks[edge[0]], boa_peaks[edge[1]]), calc_boa_peak(boa_peaks[edge[0]], boa_peaks[edge[1]]))
 
 
 '''
@@ -89,7 +96,7 @@ out_ls_write.write(node_string[0:len(node_string)-2])
 out_ls_write.write(",\n\"links\": [\n")
 i = 0
 for key in edges:
-  out_ls_write.write("{\"source\":\"" + key[0] + "\", \"target\":\"" + key[1] + "\", \"fit_val\":\"" + str(edges[key][0]) + "\", \"eigen_val\":\"" + str(edges[key][1]) + "\", \"boa_index\":\"" + str(edges[key][2]) + "\"}")
+  out_ls_write.write("{\"source\":\"" + key[0] + "\", \"target\":\"" + key[1] + "\", \"fit_val\":\"" + str(edges[key][0]) + "\", \"eigen_val\":\"" + str(edges[key][1]) + "\", \"boa_color_index\":\"" + str(edges[key][2]) + "\", \"boa_peak\":\"" + str(edges[key][3]) + "\"}")
   if i < len(edges)-1:
     out_ls_write.write(",\n")
   else:

@@ -42,7 +42,7 @@ SAN_write = open(SAN_file_name, "w")
 fit_write = open(fit_file_name, "w")
 fit_write.write("id,fitness\n")
 boa_peaks_write = open(boa_peaks_file_name, "w")
-boa_peaks_write.write("id, boa_peak\n")
+boa_peaks_write.write("id,boa_peak,boa_size\n")
 peaks_write = open(peaks_file_name, "w")
 
 
@@ -141,6 +141,7 @@ max_fit = 0
 steps = list()
 all_fitnesses = list()
 peaks = list()
+boa_sizes = dict()
 
 for i in range(0,num_points):
   fit = fitness(np.array(int2bits(i, N), dtype=bool), contrs, fit_mem)
@@ -175,8 +176,15 @@ for item in steps:
 for fitness in all_fitnesses:
   fit_write.write(str(fitness[0]) + "," + str(fitness[1]) + "\n")
 
+#compile counts for boa sizes
 for i in range(0, len(boa_uf)):
-  boa_peaks_write.write(str(i) + "," + str(root(i)) + "\n")
+  if root(i) in boa_sizes:
+    boa_sizes[root(i)] += 1
+  else:
+    boa_sizes[root(i)] = 1
+
+for i in range(0, len(boa_uf)):
+  boa_peaks_write.write(str(i) + "," + str(root(i)) + "," + str(boa_sizes[root(i)]) +"\n")
 #  print(str(i) + " has root: " + str(root(i)))
 
 for peak in peaks:

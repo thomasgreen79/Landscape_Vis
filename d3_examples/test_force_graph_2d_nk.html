@@ -89,10 +89,8 @@
       <button class="boop2">boop</button>
     </div>
     <div class="boop_container4">
-      <h3>Something Else:</h3>
-      <button class="boop3">boop</button>
-      <button class="boop3">boop</button>
-      <button class="boop3">boop</button>
+      <h3>Highlight Basin of Attraction:</h3>
+      <input onclick="toggle_boa_highlighting(this)" type="button" value="OFF" class="boop3"></input>
     </div>
   </div>
   <div id="header">
@@ -102,16 +100,20 @@
   <div id="workspace"></div>
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script>
+    // the initial seed
+    Math.seed = 6;
 
     var workspaceDiv = document.getElementById("workspace");
     var width = workspaceDiv.clientWidth - 1;
     var height = workspaceDiv.clientHeight - 1;
-    var link_width = 5;
-    var node_scale = 8;
+    var link_width = 12;
+    var node_scale = 12;
 
 
     var num_landscapes = 0;
     var color_array = ["Red","Orange","Yellow","Green","Blue","Purple","White"];
+    var contrast_colors = ["rgb(255,0,0)", "rgb(0,255,0)", "rgb(0,0,255)", "rgb(26,29,51)", "rgb(217,0,145)", "rgb(29,131,62)", "rgb(255,238,0)", "rgb(32,128,96)", "rgb(22,22,89)", "rgb(255,191,234)", "rgb(0,255,170)", "rgb(134,179,164)", "rgb(57,57,115)", "rgb(128,64,98)", "rgb(204,116,102)", "rgb(226,230,172)", "rgb(128,255,246)", "rgb(51,0,128)", "rgb(255,0,102)", "rgb(102,65,51)", "rgb(204,255,0)", "rgb(0,60,64)", "rgb(206,182,242)", "rgb(217,108,152)", "rgb(255,208,191)", "rgb(229,255,128)", "rgb(41,157,166)", "rgb(65,57,77)", "rgb(51,38,43)", "rgb(242,133,61)", "rgb(51,77,0)", "rgb(29,98,115)", "rgb(136,0,255)", "rgb(191,0,51)", "rgb(64,35,16)", "rgb(138,166,83)", "rgb(0,43,64)", "rgb(143,48,191)", "rgb(89,22,31)", "rgb(217,152,108)", "rgb(108,128,96)", "rgb(121,202,242)", "rgb(138,83,166)", "rgb(166,83,94)", "rgb(140,75,0)", "rgb(98,217,54)", "rgb(32,83,128)", "rgb(76,22,89)", "rgb(230,172,180)", "rgb(217,191,163)", "rgb(62,77,57)", "rgb(115,135,153)", "rgb(226,0,242)", "rgb(89,67,70)", "rgb(115,101,86)", "rgb(0,115,15)", "rgb(0,76,191)", "rgb(247,128,255)", "rgb(51,34,0)", "rgb(96,191,121)", "rgb(102,143,204)", "rgb(51,0,48)", "rgb(255,191,64)", "rgb(191,255,217)", "rgb(0,25,191)", "rgb(166,124,163)", "rgb(166,124,41)", "rgb(0,64,34)", "rgb(128,145,255)", "rgb(140,0,112)"];
+//    var contrast_colors = ["rgb(217,54,54)", "rgb(184,217,163)", "rgb(115,120,153)", "rgb(140,35,35)", "rgb(37,140,0)", "rgb(51,51,204)", "rgb(255,191,191)", "rgb(38,51,38)", "rgb(34,0,255)", "rgb(255,145,128)", "rgb(61,242,85)", "rgb(17,0,128)", "rgb(217,58,0)", "rgb(0,51,14)", "rgb(94,83,166)", "rgb(76,20,0)", "rgb(105,140,115)", "rgb(60,57,77)", "rgb(178,113,89)", "rgb(0,115,61)", "rgb(31,0,77)", "rgb(255,140,64)", "rgb(0,242,162)", "rgb(184,163,217)", "rgb(115,63,29)", "rgb(0,179,143)", "rgb(166,108,217)", "rgb(217,184,163)", "rgb(0,255,238)", "rgb(184,0,230)", "rgb(153,82,0)", "rgb(19,77,73)", "rgb(109,86,115)", "rgb(255,166,64)", "rgb(134,179,176)", "rgb(128,32,121)", "rgb(51,39,26)", "rgb(121,234,242)", "rgb(64,0,51)", "rgb(115,101,86)", "rgb(0,204,255)", "rgb(242,61,206)", "rgb(89,60,0)", "rgb(0,133,166)", "rgb(179,89,149)", "rgb(178,149,89)", "rgb(0,170,255)", "rgb(178,0,95)", "rgb(255,234,191)", "rgb(0,85,128)", "rgb(230,172,203)", "rgb(51,41,0)", "rgb(16,48,64)", "rgb(115,0,46)", "rgb(229,218,57)", "rgb(77,94,102)", "rgb(255,64,115)", "rgb(145,153,38)", "rgb(0,129,242)", "rgb(51,38,42)", "rgb(99,102,51)", "rgb(182,214,242)", "rgb(64,0,9)", "rgb(170,255,0)", "rgb(19,42,77)", "rgb(178,89,101)", "rgb(212,255,128)", "rgb(0,14,51)", "rgb(102,51,58)", "rgb(41,77,0)", "rgb(29,40,115)", "rgb(166,124,130)"];
     var color_index = 0;
     var svg_list = {};
 
@@ -149,7 +151,7 @@
         .attr("id", file_name)
         .attr("width", width)
         .attr("height", height)
-        .attr("viewBox", [-width/8, -height/8, width/4, height/4])
+        .attr("viewBox", [-width*32, -height*32, width*64, height*64])
         .call(d3.zoom().on("zoom", function () {
           svg_list[file_name].attr("transform", "translate(" + d3.event.transform.x + ", " + d3.event.transform.y + ")" + " scale(" + d3.event.transform.k + ")")
         }))
@@ -158,8 +160,6 @@
 
 
     function add_landscape(file_name){
-//      d3.json("./toy_problem_2/" + file_name).then(function(data){
-//      d3.json("./knapsack_problem/" + file_name).then(function(data){
       d3.json("./nk_problem/data/" + file_name).then(function(data){
 
         const links = data.links.map(d => Object.create(d));
@@ -169,12 +169,13 @@
 			.on("tick", ticked);
 
         const link = svg_list[file_name].append("g")
-          .attr("stroke", "rgb" + function(d) {var color = select_boa_color(parseInt(d.boa_index, 10); console.log(color); return color;)})
           .selectAll("line")
           .data(links)
           .enter().append("line")
+          .attr("stroke", function(d) {return contrast_colors[d.boa_color_index];})
           .attr("stroke-opacity", function(d) {return d.fit_val})
           .attr("stroke-width", function(d) {return link_width*d.eigen_val});
+//          .attr("stroke", function(d) {return select_boa_color(d.boa_color_index);})
 //          .attr("stroke-width", function(d) {return d.eigen_val});
 
         const node = svg_list[file_name].append("g")
@@ -238,35 +239,47 @@
     }
 
     function select_boa_color(index){
-      rgb_val = (0, 0, 0);
+      rgb_val = [0, 0, 0];
       if (index < 0) {
-        return rgb_val;
+        return '"rgb(' + rgb_val[0] + ',' + rgb_val[1] + ',' + rgb_val[2] + ')"';
+      } else {
+        Math.seed = (index+3)*2;
+        rgb_val[0] = parseInt(Math.seededRandom(256,0));
+        rgb_val[1] = parseInt(Math.seededRandom(256,0));
+        rgb_val[2] = parseInt(Math.seededRandom(256,0));
+      }
+      rgb_string = "rgb(" + rgb_val[0] + "," + rgb_val[1] + "," + rgb_val[2] + ")";
+      return rgb_string;
+    }
+/*
       } else if (index < 48) {
-        color_index = index/16;
-	tint_factor = index%16;
+//        color_index = parseInt(index/16, 10);
+//	tint_factor = parseInt(index%16, 10);
+        color_index = parseInt(index%3, 10);
+	tint_factor = parseInt(index/3, 10) + 1;
 	rgb_val[color_index] = 255-tint_factor*12;
       } else {
-        two_color_index = (index - 48) / 256;
-        two_color_tint_factor = (index - 48) % 256;
-	first_color_tint_factor = 255-two_color_tint_factor / 16;
-	second_color_tint_factor = 255-two_color_tint_factor % 16;
+        two_color_index = parseInt((index - 48) / 256, 10);
+        two_color_tint_factor = parseInt((index - 48, 10) % 256);
+	first_color_tint_factor = 255-(parseInt(two_color_tint_factor / 16, 10)*12);
+	second_color_tint_factor = 255-(parseInt(two_color_tint_factor % 16, 10)*12);
         if (two_color_index == 0) {
-          rgb_val[0] = first_color_tint_factor*12;
-          rgb_val[1] = second_color_tint_factor*12;
+          rgb_val[0] = first_color_tint_factor;
+          rgb_val[1] = second_color_tint_factor;
         } else if (two_color_index == 1) {
-          rgb_val[0] = first_color_tint_factor*12;
-          rgb_val[2] = second_color_tint_factor*12;
+          rgb_val[0] = first_color_tint_factor;
+          rgb_val[2] = second_color_tint_factor;
         } else if (two_color_index == 2) {
-          rgb_val[1] = first_color_tint_factor*12;
-          rgb_val[2] = second_color_tint_factor*12;
+          rgb_val[1] = first_color_tint_factor;
+          rgb_val[2] = second_color_tint_factor;
         } else {
-          console.log("Too many peaks!")
+          console.log("Too many peaks! Index was: " + index)
         }
       }
-      console.log(rgb_val);
-      return rgb_val;
+      rgb_string = "rgb(" + rgb_val[0] + "," + rgb_val[1] + "," + rgb_val[2] + ")";
+      return rgb_string;
     }
-
+*/
     function node_color_button(){
       points = document.getElementsByTagName("circle");
       var i, new_color;
@@ -280,6 +293,45 @@
     function cycle_color(){
       color_index = (color_index+1) % 7;
       return color_array[color_index];
+    }
+
+    function toggle_boa_highlighting(button){
+      if (button.value=="OFF"){	//Turn on BOA highlighting
+        button.value = "ON";
+        button.style.borderStyle = "inset";
+        d3.selectAll("circle").on("click", function(d){highlight_BOA(d)});
+      } else {  //Turn it off
+        button.value = "OFF";
+        button.style.borderStyle = "outset";
+        d3.selectAll("circle").on("click", null);
+        d3.selectAll("line")
+        .style("stroke", function(d){return contrast_colors[d.boa_color_index]});
+      }
+    }
+ 
+    function highlight_BOA(node){
+      if (node.is_peak == "True"){
+        d3.selectAll("line")
+        .style("stroke", function(d){
+          if (d.boa_peak == node.id){
+            return contrast_colors[d.boa_color_index];
+          } else {
+            return "CCC";
+          }
+        });
+      }
+    }
+
+    // in order to work 'Math.seed' must NOT be undefined,
+    // so in any case, you HAVE to provide a Math.seed
+    Math.seededRandom = function(max, min) {
+      max = max || 1;
+      min = min || 0;
+ 
+      Math.seed = (Math.seed * 9301 + 49297) % 233280;
+      var rnd = Math.seed / 233280;
+ 
+      return min + rnd * (max - min);
     }
 
     document.getElementById('file-input')
