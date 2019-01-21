@@ -227,7 +227,7 @@ for peak in peaks:
 
 if read_or_write is 'w':
   write_fit_mem_to_file()
-  print(str(fit_mem))
+#  print(str(fit_mem))
 #print(peaks)
 
 print("max num is: " + str(max_num))
