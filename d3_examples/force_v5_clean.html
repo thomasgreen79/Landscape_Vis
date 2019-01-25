@@ -169,6 +169,7 @@
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script>
     // the initial seed
+    var sizeof = require('object-sizeof');
     Math.seed = 6;
 
     var workspaceDiv = document.getElementById("workspace");
@@ -176,7 +177,7 @@
     var height = workspaceDiv.clientHeight - 1;
     var link_width = 12;
     var node_scale = 12;
-
+    var file_json;
 
     var num_landscapes = 0;
     var color_array = ["Red","Orange","Yellow","Green","Blue","Purple","White"];
@@ -184,9 +185,17 @@
     var color_index = 0;
     var svg_list = {};
 
+    alert(sizeof(color_index));
+
     function addExperiment(fileEvent){
       if (fileEvent.target.files[0] && !(fileEvent.target.files[0].name in svg_list)){
         num_landscapes += 1;
+        var landscape_read = new FileReader();
+        landscape_read.onload = function(text){
+          file_json = JSON.parse(text.target.result);
+          alert(typeof file_json);
+        }
+        landscape_read.readAsText(fileEvent.target.files[0]);
         add_new_svg(fileEvent.target.files[0].name);
         add_landscape(fileEvent.target.files[0].name);
       }
@@ -318,7 +327,6 @@
         rgb_val[2] = parseInt(Math.seededRandom(256,0));
       }
       rgb_string = "rgb(" + rgb_val[0] + "," + rgb_val[1] + "," + rgb_val[2] + ")";
-      console.log(index + " has color: " + rgb_string);
       return rgb_string;
     }
 /*
