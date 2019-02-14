@@ -1,118 +1,20 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<style>
-  #header {
-    position: fixed;
-    left: 1%;
-    right: 22%;
-    top: 0px;
-    bottom: 0px;
-    height: 10%;
-  }
-  #workspace {
-    position: fixed;
-    left: 1%;
-    right: 22%;
-    top: 10%;
-    bottom: 0px;
-  }
-  #control_panel {
-    position: fixed;
-    left: 78%;
-    right: 0px;
-    top: 0px;
-    bottom: 0px;
-    width: 22%;
-    outline-style: solid;
-  }
-  .boop_container1 {
-    top: 2%;
-    left: 79%;
-    height: 30%;
-  }
-  .boop_container2 {
-    top: 20%;
-    left: 79%;
-    height: 15%;
-  }
-  .boop_container3 {
-    top: 29%;
-    left: 79%;
-    height: 15%;
-  }
-  .boop_container4 {
-    top: 69%;
-    left: 79%;
-    height: 30%;
-  }
-  .boop1 {
-    height: 25%;
-    width: 45%;
-  }
-  .boop2 {
-    margin-left: 5%;
-    height: 25%;
-    width: 40%;
-  }
-  .boop3 {
-    height: 25%;
-    width: 95%;
-  }
-  .parameters_header {
-    margin-top: 2%;
-    margin-bottom: 2%;
-  }
-  .gen_section_header_text {
-    margin-left: 2%;
-  }
-  .parameters_header_text {
-    display: inline;
-    width: 45%;
-  }
-  .apply_boop {
-    margin-left: 15%;
-    margin-right: 10%;
-    width: 25%;
-  }
-  .parameter_text {
-    margin-left: 5%;
-    margin-top: 0%;
-    margin-right: 0%;
-    margin-bottom: 0%;
-  }
-  .slider {
-    margin-left: 10%;
-    width: 80%;
-  }
-  .boa_update_form{
-    display: inline-block;
-    margin-left: 4%;
-    width: 50%;
-    height: 80%;
-    border: solid black 2px;
-  }
-  .boa_list {
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-  }
-  .boa_toggle_container {
-    display: inline-block;
-    vertical-align: top;
-    margin-left: 5%;
-    width: 35%;
-    height: 80%;
-  }
-  .boa_toggle_boop {
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-  }
-</style>
-
+<head>
+  <link rel="stylesheet" href="style_sheets/appearance.css">
+</head>
 <body>
-  <div id="control_panel">
-    <div class="boop_container1">
+  <div id="control_panel_space">
+    <div id="Simulation">
+      <h3 class="gen_section_header_text">Simulation:</h3>
+      <button class="boop2" onClick="start_simulation()">Start Simulation</button>
+      <button class="boop2" onClick="stop_simulation()">Stop Simulation</button>
+      <p class="simulation_text">Barnes Hut Threshold:</p>
+      <p class="simulation_text">Force Charge Strength:</p>
+      <input type="range" min="1" max="100" value="50" class="simulation_slider">
+      <input type="range" min="1" max="100" value="50" class="simulation_slider">
+    </div>
+    <div id="Parameter_Settings">
       <div class="parameters_header">
         <h3 class="gen_section_header_text parameters_header_text">Parameter Settings:</h3>
         <button class="apply_boop">APPLY</button>
@@ -130,96 +32,84 @@
       <p class="parameter_text">Peak Density:</p>
       <input type="range" min="1" max="100" value="50" class="slider">
     </div>
-    <div class="boop_container2">
-      <h3 class="gen_section_header_text">Color:</h3>
-      <button class="boop2" onClick="node_color_button()">node_color_boop</button>
-      <button class="boop2">boop</button>
-      <button class="boop2">boop</button>
-      <button class="boop2">boop</button>
+    <div id="Rotation">
+      <h3 class="gen_section_header_text">Rotation:</h3>
+      <button class="boop3" onClick="node_color_button()">node_color_boop</button>
     </div>
-    <div class="boop_container3">
-      <h3 class="gen_section_header_text">Graph Appearance:</h3>
-      <button class="boop2">boop</button>
-      <button class="boop2">boop</button>
-      <button class="boop2">boop</button>
-      <button class="boop2">boop</button>
-    </div>
-    <div class="boop_container4">
+    <div id="Basin_Highlighting">
       <h3 class="gen_section_header_text">Highlight Basins of Attraction:</h3>
-        <form action="//www.html.am/html-codes/forms/html-form-tag-action.cfm" target="id_list" method="get" class= "boa_update_form">
-          <select class= "boa_list" name="id" multiple>
-            <option value ="none">7404</option>
-            <option value ="guava">15789</option>
-            <option value ="lychee">287</option>
-            <option value ="papaya">15467</option>
-            <option value ="watermelon">12</option>
-          </select> 
-          <p><input type="submit" value="Update Basins"></p>
+        <form action="#" onsubmit="return false" id="boa_submit_form" class= "boa_update_form">
+          <select id="boa_submit_select" class="boa_list" name="id" multiple></select> 
+          <input onclick="update_BOA_highlights()" type="submit" value="Update Basins">
         </form>
       <div class="boa_toggle_container">
-        <input onclick="toggle_boa_highlighting(this)" type="button" value="OFF" class="boa_toggle_boop"></input>
+        <input onclick="toggle_boa_highlighting(this)" id="boa_toggle_button" type="button" value="OFF" class="boa_toggle_boop"></input>
       </div>
     </div>
   </div>
-  <div id="header">
+  <div id="header_space">
     <h2>Add landscape to display:</h2>
     <input type="file" id="file-input"/>
   </div>
-  <div id="workspace"></div>
+  <div id="work_space">
+  </div>
+  <div id="legend_space">
+    <div id="legend">
+      <table align="center" id="legend_table">
+        <h2 class="legend_header">Basin Values:</h2>
+        <tr>
+          <th class="legend_column">Rank</th>
+          <th class="legend_column">Peak_ID</th>
+          <th class="legend_column">Eigen_Val</th>
+          <th class="legend_column">Fitness</th>
+        </tr>
+      </table>
+    </div>
+    <input class="legend_button" onclick="legend_toggle_press(this)" type="button" value="<<"></input>
+
+  </div>
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script>
     // the initial seed
 //    var sizeof = require('object-sizeof');
     Math.seed = 6;
 
-    var workspaceDiv = document.getElementById("workspace");
+    var workspaceDiv = document.getElementById("work_space");
+
     var width = workspaceDiv.clientWidth - 1;
     var height = workspaceDiv.clientHeight - 1;
+
     var link_width = 12;
     var node_scale = 12;
-    var file_json;
+
+    //Both of these may be put into a dictionary to allow multiple landscapes at the same time
+    var file_json;  //JSON Object to hold contents of file
+    var simulation;  //Holds reference to simulation in order to start and stop it
+    var svg_list = {};
+    var peaks_list = {};
 
     var num_landscapes = 0;
-    var color_array = ["Red","Orange","Yellow","Green","Blue","Purple","White"];
-    var contrast_colors = ["rgb(255,0,0)", "rgb(0,255,64)", "rgb(0,0,255)", "rgb(26,29,51)", "rgb(217,0,145)", "rgb(29,131,62)", "rgb(255,238,0)", "rgb(32,128,96)", "rgb(22,22,89)", "rgb(255,191,234)", "rgb(0,255,170)", "rgb(134,179,164)", "rgb(57,57,115)", "rgb(128,64,98)", "rgb(204,116,102)", "rgb(226,230,172)", "rgb(128,255,246)", "rgb(51,0,128)", "rgb(255,0,102)", "rgb(102,65,51)", "rgb(204,255,0)", "rgb(0,60,64)", "rgb(206,182,242)", "rgb(217,108,152)", "rgb(255,208,191)", "rgb(229,255,128)", "rgb(41,157,166)", "rgb(65,57,77)", "rgb(51,38,43)", "rgb(242,133,61)", "rgb(51,77,0)", "rgb(29,98,115)", "rgb(136,0,255)", "rgb(191,0,51)", "rgb(64,35,16)", "rgb(138,166,83)", "rgb(0,43,64)", "rgb(143,48,191)", "rgb(89,22,31)", "rgb(217,152,108)", "rgb(108,128,96)", "rgb(121,202,242)", "rgb(138,83,166)", "rgb(166,83,94)", "rgb(140,75,0)", "rgb(98,217,54)", "rgb(32,83,128)", "rgb(76,22,89)", "rgb(230,172,180)", "rgb(217,191,163)", "rgb(62,77,57)", "rgb(115,135,153)", "rgb(226,0,242)", "rgb(89,67,70)", "rgb(115,101,86)", "rgb(0,115,15)", "rgb(0,76,191)", "rgb(247,128,255)", "rgb(51,34,0)", "rgb(96,191,121)", "rgb(102,143,204)", "rgb(51,0,48)", "rgb(255,191,64)", "rgb(191,255,217)", "rgb(0,25,191)", "rgb(166,124,163)", "rgb(166,124,41)", "rgb(0,64,34)", "rgb(128,145,255)", "rgb(140,0,112)","rgb(217,54,54)", "rgb(184,217,163)", "rgb(115,120,153)", "rgb(140,35,35)", "rgb(37,140,0)", "rgb(51,51,204)", "rgb(255,191,191)", "rgb(38,51,38)", "rgb(34,0,255)", "rgb(255,145,128)", "rgb(61,242,85)", "rgb(17,0,128)", "rgb(217,58,0)", "rgb(0,51,14)", "rgb(94,83,166)", "rgb(76,20,0)", "rgb(105,140,115)", "rgb(60,57,77)", "rgb(178,113,89)", "rgb(0,115,61)", "rgb(31,0,77)", "rgb(255,140,64)", "rgb(0,242,162)", "rgb(184,163,217)", "rgb(115,63,29)", "rgb(0,179,143)", "rgb(166,108,217)", "rgb(217,184,163)", "rgb(0,255,238)", "rgb(184,0,230)", "rgb(153,82,0)", "rgb(19,77,73)", "rgb(109,86,115)", "rgb(255,166,64)", "rgb(134,179,176)", "rgb(128,32,121)", "rgb(51,39,26)", "rgb(121,234,242)", "rgb(64,0,51)", "rgb(115,101,86)", "rgb(0,204,255)", "rgb(242,61,206)", "rgb(89,60,0)", "rgb(0,133,166)", "rgb(179,89,149)", "rgb(178,149,89)", "rgb(0,170,255)", "rgb(178,0,95)", "rgb(255,234,191)", "rgb(0,85,128)", "rgb(230,172,203)", "rgb(51,41,0)", "rgb(16,48,64)", "rgb(115,0,46)", "rgb(229,218,57)", "rgb(77,94,102)", "rgb(255,64,115)", "rgb(145,153,38)", "rgb(0,129,242)", "rgb(51,38,42)", "rgb(99,102,51)", "rgb(182,214,242)", "rgb(64,0,9)", "rgb(170,255,0)", "rgb(19,42,77)", "rgb(178,89,101)", "rgb(212,255,128)", "rgb(0,14,51)", "rgb(102,51,58)", "rgb(41,77,0)", "rgb(29,40,115)", "rgb(166,124,130)"];
     var color_index = 0;
-    var svg_list = {};
+    var color_array = ["Red","Orange","Yellow","Green","Blue","Purple","White"];
 
-//    alert(sizeof(color_index));
+    //Work on colors to achieve best mix of contrast
+    var contrast_colors = ["rgb(255,0,0)", "rgb(0,255,64)", "rgb(0,0,255)", "rgb(26,29,51)", "rgb(217,0,145)", "rgb(29,131,62)", "rgb(255,238,0)", "rgb(32,128,96)", "rgb(22,22,89)", "rgb(255,191,234)", "rgb(0,255,170)", "rgb(134,179,164)", "rgb(57,57,115)", "rgb(128,64,98)", "rgb(204,116,102)", "rgb(226,230,172)", "rgb(128,255,246)", "rgb(51,0,128)", "rgb(255,0,102)", "rgb(102,65,51)", "rgb(204,255,0)", "rgb(0,60,64)", "rgb(206,182,242)", "rgb(217,108,152)", "rgb(255,208,191)", "rgb(229,255,128)", "rgb(41,157,166)", "rgb(65,57,77)", "rgb(51,38,43)", "rgb(242,133,61)", "rgb(51,77,0)", "rgb(29,98,115)", "rgb(136,0,255)", "rgb(191,0,51)", "rgb(64,35,16)", "rgb(138,166,83)", "rgb(0,43,64)", "rgb(143,48,191)", "rgb(89,22,31)", "rgb(217,152,108)", "rgb(108,128,96)", "rgb(121,202,242)", "rgb(138,83,166)", "rgb(166,83,94)", "rgb(140,75,0)", "rgb(98,217,54)", "rgb(32,83,128)", "rgb(76,22,89)", "rgb(230,172,180)", "rgb(217,191,163)", "rgb(62,77,57)", "rgb(115,135,153)", "rgb(226,0,242)", "rgb(89,67,70)", "rgb(115,101,86)", "rgb(0,115,15)", "rgb(0,76,191)", "rgb(247,128,255)", "rgb(51,34,0)", "rgb(96,191,121)", "rgb(102,143,204)", "rgb(51,0,48)", "rgb(255,191,64)", "rgb(191,255,217)", "rgb(0,25,191)", "rgb(166,124,163)", "rgb(166,124,41)", "rgb(0,64,34)", "rgb(128,145,255)", "rgb(140,0,112)","rgb(217,54,54)", "rgb(184,217,163)", "rgb(115,120,153)", "rgb(140,35,35)", "rgb(37,140,0)", "rgb(51,51,204)", "rgb(255,191,191)", "rgb(38,51,38)", "rgb(34,0,255)", "rgb(255,145,128)", "rgb(61,242,85)", "rgb(17,0,128)", "rgb(217,58,0)", "rgb(0,51,14)", "rgb(94,83,166)", "rgb(76,20,0)", "rgb(105,140,115)", "rgb(60,57,77)", "rgb(178,113,89)", "rgb(0,115,61)", "rgb(31,0,77)", "rgb(255,140,64)", "rgb(0,242,162)", "rgb(184,163,217)", "rgb(115,63,29)", "rgb(0,179,143)", "rgb(166,108,217)", "rgb(217,184,163)", "rgb(0,255,238)", "rgb(184,0,230)", "rgb(153,82,0)", "rgb(19,77,73)", "rgb(109,86,115)", "rgb(255,166,64)", "rgb(134,179,176)", "rgb(128,32,121)", "rgb(51,39,26)", "rgb(121,234,242)", "rgb(64,0,51)", "rgb(115,101,86)", "rgb(0,204,255)", "rgb(242,61,206)", "rgb(89,60,0)", "rgb(0,133,166)", "rgb(179,89,149)", "rgb(178,149,89)", "rgb(0,170,255)", "rgb(178,0,95)", "rgb(255,234,191)", "rgb(0,85,128)", "rgb(230,172,203)", "rgb(51,41,0)", "rgb(16,48,64)", "rgb(115,0,46)", "rgb(229,218,57)", "rgb(77,94,102)", "rgb(255,64,115)", "rgb(145,153,38)", "rgb(0,129,242)", "rgb(51,38,42)", "rgb(99,102,51)", "rgb(182,214,242)", "rgb(64,0,9)", "rgb(170,255,0)", "rgb(19,42,77)", "rgb(178,89,101)", "rgb(212,255,128)", "rgb(0,14,51)", "rgb(102,51,58)", "rgb(41,77,0)", "rgb(29,40,115)", "rgb(166,124,130)"];
 
     function addExperiment(fileEvent){
       if (fileEvent.target.files[0] && !(fileEvent.target.files[0].name in svg_list)){
         num_landscapes += 1;
         var landscape_read = new FileReader();
+
         landscape_read.onload = function(text){
           file_json = JSON.parse(text.target.result);
- //         alert(typeof file_json);
+          add_new_svg(fileEvent.target.files[0].name);
+          add_landscape(fileEvent.target.files[0].name, file_json);
+          add_legend(fileEvent.target.files[0].name, file_json);
         }
+
         landscape_read.readAsText(fileEvent.target.files[0]);
-        add_new_svg(fileEvent.target.files[0].name);
-        add_landscape(fileEvent.target.files[0].name);
       }
     }
-
-//  var zoom = d3.zoom()
-//    .scaleExtent([1, 40])
-//    .translateExtent([[-100, -100], [width + 90, height + 100]])
-//    .on("zoom", zoomed);
-
-//  var view = svg1.append("rect")
-//    .attr("class", "view")
-//    .attr("x", 0.5)
-//    .attr("y", 0.5)
-//    .attr("width", width - 1)
-//    .attr("height", height - 1);
-
-//  svg1.call(zoom);
-
-//  function zoomed() {
-//    view.attr("transform", d3.event.transform);
-//  gX.call(xAxis.scale(d3.event.transform.rescaleX(x)));
-//  gY.call(yAxis.scale(d3.event.transform.rescaleY(y)));
-//  }
 
     function add_new_svg(file_name){
       svg_list[file_name] = d3.select(workspaceDiv)
@@ -234,57 +124,96 @@
         .append("g");
     }
 
+    function add_landscape(file_name, file_json){
+      const links = file_json.links.map(d => Object.create(d));
+      const nodes = file_json.nodes.map(d => Object.create(d));
+      simulation = forceSimulation(nodes, links)
+        		.on("tick", ticked);
 
-    function add_landscape(file_name){
-      d3.json("./nk_problem/data/" + file_name).then(function(data){
+      const link = svg_list[file_name].append("g")
+        .selectAll("line")
+        .data(links)
+        .enter().append("line")
+        .attr("stroke", function(d) {return select_boa_color(d.boa_color_index);})
+        .attr("stroke-opacity", function(d) {return d.fit_val})
+        .attr("stroke-width", function(d) {return link_width*d.eigen_val});
 
-        const links = data.links.map(d => Object.create(d));
-        const nodes = data.nodes.map(d => Object.create(d));
-        const simulation = forceSimulation(nodes, links)
-			.force("charge", d3.forceManyBody().strength(-12000))
-			.on("tick", ticked);
+      const node = svg_list[file_name].append("g")
+        .attr("stroke", "#000")
+        .selectAll("circle")
+        .data(nodes)
+        .enter().append("circle")
+        .attr("stroke-width", function(d) {if (d.is_peak === "True") return node_scale*2; else return node_scale*0.6})
+        .attr("r", function(d) {if (d.is_peak === "True") return node_scale*24; else return node_scale*8})
+        .attr("fill", function(d) { if (d.is_peak === "True") return "Yellow"; else return d3.interpolateRdYlBu(1-d.fitness); })
+        .call(drag(simulation));
 
-        const link = svg_list[file_name].append("g")
-          .selectAll("line")
-          .data(links)
-          .enter().append("line")
-          .attr("stroke", function(d) {return select_boa_color(d.boa_color_index);})
-          .attr("stroke-opacity", function(d) {return d.fit_val})
-          .attr("stroke-width", function(d) {return link_width*d.eigen_val});
-//          .attr("stroke", function(d) {return select_boa_color(d.boa_color_index);})
-//          .attr("stroke-width", function(d) {return d.eigen_val});
+      node.append("title")
+        .text(d => d.id);
 
-        const node = svg_list[file_name].append("g")
-          .attr("stroke", "#000")
-          .selectAll("circle")
-          .data(nodes)
-          .enter().append("circle")
-          .attr("stroke-width", function(d) {if (d.is_peak === "True") return node_scale*2; else return node_scale*0.6})
-          .attr("r", function(d) {if (d.is_peak === "True") return node_scale*24; else return node_scale*8})
-          .attr("fill", function(d) { if (d.is_peak === "True") return "Yellow"; else return d3.interpolateRdYlBu(1-d.fitness); })
-          .call(drag(simulation));
+      function ticked() {
+        link
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+        node
+          .attr("cx", d => d.x)
+          .attr("cy", d => d.y);
+      }
+    }
 
-        node.append("title")
-          .text(d => d.id);
+    function add_legend(file_name, file_json){
+      add_peaks(file_name, file_json);
+      boa_selections = document.getElementById("boa_submit_select");
+      legend_table = document.getElementById("legend_table");
+      for (var i = 0; i < peaks_list[file_name].length; i++){
+        var opt = document.createElement('option');
+        opt.value = peaks_list[file_name][i].id;
+        opt.innerHTML = peaks_list[file_name][i].id;
+        boa_selections.appendChild(opt);
 
-        function ticked() {
-          link
-            .attr("x1", d => d.source.x)
-            .attr("y1", d => d.source.y)
-            .attr("x2", d => d.target.x)
-            .attr("y2", d => d.target.y);
-    
-          node
-            .attr("cx", d => d.x)
-            .attr("cy", d => d.y);
-        }
-      });
+        legend_table.appendChild(create_legend_element(file_name, i));
+      }
+    }
+
+    function add_peaks(file_name, file_json){
+      peaks_list[file_name] = file_json.nodes.filter(function(d){return d.is_peak === "True"});
+    }
+
+    function create_legend_element(file_name, i){
+      var t_row = document.createElement('TR');
+      var c_box = document.createElement('div');
+      c_box.setAttribute("class", "legend_color_box");
+      c_box.style.background = select_boa_color(i);
+      var b_rank = document.createElement('TD');
+      var b_rank_txt = document.createTextNode(i+1);
+      b_rank.appendChild(c_box);
+      b_rank.appendChild(b_rank_txt);
+      b_rank.style.textAlign = "center";
+      var p_id = document.createElement('TD');
+      var p_id_txt = document.createTextNode(peaks_list[file_name][i].id);
+      p_id.appendChild(p_id_txt);
+      p_id.style.textAlign = "center";
+      var e_val = document.createElement('TD');
+      var e_val_txt = document.createTextNode(parseFloat(peaks_list[file_name][i].eigen_cent).toFixed(3));
+      e_val.appendChild(e_val_txt);
+      e_val.style.textAlign = "center";
+      var fit = document.createElement('TD');
+      var fit_txt = document.createTextNode(parseFloat(peaks_list[file_name][i].fitness).toFixed(3));
+      fit.appendChild(fit_txt);
+      fit.style.textAlign = "center";
+      t_row.appendChild(b_rank);
+      t_row.appendChild(p_id);
+      t_row.appendChild(e_val);
+      t_row.appendChild(fit);
+      return t_row; 
     }
 
     function forceSimulation(nodes, links) {
       return d3.forceSimulation(nodes)
           .force("link", d3.forceLink(links).id(d => d.id))
-          .force("charge", d3.forceManyBody())
+          .force("charge", d3.forceManyBody().strength(-12000))
           .force("x", d3.forceX())
           .force("y", d3.forceY());
     }
@@ -358,26 +287,33 @@
       return rgb_string;
     }
 */
-    function node_color_button(){
-      points = document.getElementsByTagName("circle");
-      var i, new_color;
-      new_color = cycle_color();
-      for (i = 0; i < points.length; i++) {
-        points[i].style.fill = new_color;
-        //points[i].style.fill = cycle_color(); //party_button!!
+    function start_simulation(){
+      alert("Simulation restarted.");
+      simulation.restart();
+    }
+
+    function stop_simulation(){
+      alert("Simulation stopped.");
+      simulation.stop();
+    }
+
+    function legend_toggle_press(button){
+      legend = document.getElementById("legend");
+      if (button.value=="<<"){
+        button.value = ">>";
+        legend.style.width = "0.01%";
+      } else {
+        button.value = "<<";
+        legend.style.width = "100%";
       }
     }
 
-    function cycle_color(){
-      color_index = (color_index+1) % 7;
-      return color_array[color_index];
-    }
-
+//May need to update boa_highlighting functions to handle multiple landscapes    
     function toggle_boa_highlighting(button){
       if (button.value=="OFF"){	//Turn on BOA highlighting
         button.value = "ON";
         button.style.borderStyle = "inset";
-        d3.selectAll("circle").on("click", function(d){highlight_BOA(d)});
+//        d3.selectAll("circle").on("click", function(d){highlight_BOA(d)});
       } else {  //Turn it off
         button.value = "OFF";
         button.style.borderStyle = "outset";
@@ -385,6 +321,35 @@
         d3.selectAll("line")
         .style("stroke", function(d){return contrast_colors[d.boa_color_index]})
         .style("stroke-width", function(d) {return link_width*d.eigen_val});
+      }
+    }
+
+    function update_BOA_highlights(){
+//      alert("Pressed");
+      selection = document.getElementById("boa_submit_select");
+      var boa_toggle = document.getElementById("boa_toggle_button");
+      if (boa_toggle.value === "ON"){
+        selected_peaks = [];
+        for (i = 0; i < selection.options.length; i++){
+          if (selection.options[i].selected){
+            selected_peaks.push(selection.options[i].value);
+          }
+        }
+        d3.selectAll("line")
+          .style("stroke", function(d){
+            if (selected_peaks.includes(d.boa_peak)){
+              return select_boa_color(d.boa_color_index);
+            } else {
+              return "CCC";
+            }
+          })
+          .style("stroke-width", function(d){
+            if (selected_peaks.includes(d.boa_peak)){
+              return link_width*d.eigen_val*3;
+            } else {
+              return link_width*d.eigen_val;
+            }
+          });
       }
     }
  
@@ -422,6 +387,42 @@
 
     document.getElementById('file-input')
       .addEventListener('change', addExperiment, false);
+
+    function node_color_button(){
+      points = document.getElementsByTagName("circle");
+      var i, new_color;
+      new_color = cycle_color();
+      for (i = 0; i < points.length; i++) {
+        points[i].style.fill = new_color;
+        //points[i].style.fill = cycle_color(); //party_button!!
+      }
+    }
+
+    function cycle_color(){
+      color_index = (color_index+1) % 7;
+      return color_array[color_index];
+    }
+
+//Zoom code moved here to clear up code above.
+//  var zoom = d3.zoom()
+//    .scaleExtent([1, 40])
+//    .translateExtent([[-100, -100], [width + 90, height + 100]])
+//    .on("zoom", zoomed);
+
+//  var view = svg1.append("rect")
+//    .attr("class", "view")
+//    .attr("x", 0.5)
+//    .attr("y", 0.5)
+//    .attr("width", width - 1)
+//    .attr("height", height - 1);
+
+//  svg1.call(zoom);
+
+//  function zoomed() {
+//    view.attr("transform", d3.event.transform);
+//  gX.call(xAxis.scale(d3.event.transform.rescaleX(x)));
+//  gY.call(yAxis.scale(d3.event.transform.rescaleY(y)));
+//  }
 
   </script>
 
