@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  <link rel="stylesheet" href="style_sheets/appearance_SAN.css">
+</style>
+<body>
+  <div id="header_space">
+    <h2>Add landscape to display:</h2>
+    <input type="file" id="file-input"/>
+  </div>
+  <div id="work_space">
+    <div id="3d-graph"></div>
+  </div>
+  <script src="//unpkg.com/3d-force-graph"></script>
+  <script>
+
+    function add_landscape(fileEvent){
+      var landscape_read = new FileReader();
+      landscape_read.onload = function(text){
+        file_json = JSON.parse(text.target.result);
+        draw_landscape(file_json);
+      }
+      landscape_read.readAsText(fileEvent.target.files[0]);
+    }
+
+    function draw_landscape(gData){
+      const Graph = ForceGraph3D()(document.getElementById('3d-graph'))
+        .nodeColor("blue")
+        .numDimensions(3)
+        .backgroundColor("gray")
+        .linkColor("black")
+        .linkOpacity(0.4)
+        .dagMode("bu")
+        .dagLevelDistance(250)
+        .graphData(gData);
+//      .jsonUrl("file:///home/thomasgreen79/BSU_Research/Thesis_research/Landscape_Visualization/d3_examples/toy_problem_2/toy_2_5_bit_cx_SAN.json");
+    }
+
+    document.getElementById('file-input')
+      .addEventListener('change', add_landscape, false);
+  </script>
+</body>
+
