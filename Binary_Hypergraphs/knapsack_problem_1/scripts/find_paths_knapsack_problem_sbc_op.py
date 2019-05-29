@@ -1,3 +1,10 @@
+'''
+Script for generating knapsack Landscape with a specific set of weights and values.
+The chosen set has no significance other than weights vals are all approximately
+5x-10x the values vals to keep them relatively of equal likelihood to be chosen
+given a search, and no weights are identical.
+'''
+
 import sys
 import numpy as np
 from numpy import random
@@ -15,8 +22,10 @@ W = int(sys.argv[2])
 n = int(sys.argv[3])
 
 #Could initialize randomly
-wt = [2, 5, 7, 3, 1, 4, 10, 14, 6, 8, 12, 15, 13, 9]
-val = [20, 30, 35, 12, 3, 15, 50, 60, 25, 32, 62, 75, 68, 42]
+'''Able to choose problem sizes up to length of arrays, but not larger than'''
+
+wt = [2, 5, 7, 3, 1, 4, 10, 14, 6, 8, 12, 15, 13, 9, 17, 13, 21, 19, 16, 11]
+val = [20, 30, 35, 12, 3, 15, 50, 60, 25, 32, 62, 75, 68, 42, 112, 68, 149, 152, 128, 99]
 
 
 #Adding two lists for UF code for Basin of Attraction data
@@ -28,11 +37,28 @@ for i in range(0,num_points):
   boa_uf.append(i)
   size_uf.append(1)
 
+
+'''Usage
+
+    **Output file_names are expected input to run script.**
+
+After calculating the Steepest Ascent Network of the given search problem Fitness Landscape,
+various data is output to files used when creating the jsons used for visualization.
+
+1. Full egde-list of SAN FL as semicolon separated pairs
+2. List of nodes and their fitness values
+3. List of nodes and the peaks of their SAN Basins of Attraction, with size of each BOA listed
+4. List of all peaks
+'''
+
+'''Code'''
+#File names from command line
 SAN_file_name = sys.argv[4]
 fit_file_name = sys.argv[5]
 boa_peaks_file_name = sys.argv[6]
 peaks_file_name = sys.argv[7]
 
+#writer objects for each file name
 SAN_write = open(SAN_file_name, "w")
 fit_write = open(fit_file_name, "w")
 fit_write.write("id,fitness\n")
@@ -41,6 +67,7 @@ boa_peaks_write.write("id,boa_peak,boa_size\n")
 peaks_write = open(peaks_file_name, "w")
 
 
+#Functions
 def fitness(value):
   format_string = '{0:0' + str(base) + 'b}'
 #  fitness = -1.0
@@ -69,7 +96,7 @@ def get_neighbors(vert_id, num_neighbors):
     neighbors.append(flip_bit(vert_id, i))
   return neighbors
 
-def get_nth_ascent(neighbors, n):
+def get_nth_ascent(neighbors, n):	###Remove n, and rewrite as steepest (or first..)###
   neighbors_descending = list()
   for i in range(0, len(neighbors)):
     #score = fitness(np.array(int2bits(neighbors[i], N), dtype=bool), contrs, fit_mem)
@@ -116,14 +143,21 @@ def root(p):
     p = boa_uf[p]
   return p
 
-#contrs = gen_contrs(N, K)
+
+'''-----------------------------------------------------------------------------------------------'''
+
+
+###Script Start###
+
 max_num = -1
 max_fit = 0
-
 steps = list()
 all_fitnesses = list()
 peaks = list()
 boa_sizes = dict()
+
+
+#=== Calculating Steepest Ascent of FL ===#
 
 for i in range(0,num_points):
 #  fit = fitness(np.array(int2bits(i, N), dtype=bool), contrs, fit_mem)
@@ -153,6 +187,9 @@ for i in range(0,num_points):
     print("Processed: " + str(i))
 
 
+
+#=== Output of Calculated Steepest Ascent Values ===#
+
 for item in steps:
   SAN_write.write(item + "\n")
 
@@ -174,6 +211,7 @@ for peak in peaks:
   peaks_write.write(str(peak) + "\n")
 
 
+'''Likely old code..'''
 
 '''
 def get_steepest_ascent(neighbors):
@@ -205,6 +243,6 @@ for item in steps:
   print(item)
 '''
 
-
+#Finishing output
 print("max num is: " + str(max_num))
 print("max fitness is: " + str(max_fit))

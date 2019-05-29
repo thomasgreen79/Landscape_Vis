@@ -130,6 +130,14 @@
   width: 100%;
   height: 100%;
 }
+.add_file_area {
+  display: inline-block;
+  width: 30%;
+}
+.note_area {
+  display: inline-block;
+  width: 69%;
+}
 #legend {
   overflow: auto;
   top: 5%;
