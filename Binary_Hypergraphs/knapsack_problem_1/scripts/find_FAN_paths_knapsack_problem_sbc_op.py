@@ -5,7 +5,7 @@ The chosen set has no significance other than weights vals are all approximately
 given a search, and no weights are identical.
 '''
 
-import sys, queue
+import sys, Queue
 import numpy as np
 from numpy import random
 
@@ -65,7 +65,7 @@ FAN_write.write("Source;Target;Weight\n")
 fit_write = open(fit_file_name, "w")
 fit_write.write("id,fitness\n")
 boa_peaks_write = open(boa_peaks_file_name, "w")
-boa_peaks_write.write("id,boa_peak,boa_size\n")
+boa_peaks_write.write("id;boa_list;boa_size\n")
 peaks_write = open(peaks_file_name, "w")
 
 #Functions
@@ -111,6 +111,9 @@ def calc_FA_probs(neighbors, node_id):
       neighbors_improved[neighbors[i]] = 1
     else:
       neighbors_improved[neighbors[i]] = 0
+  '''Break down what's happening here to find edge cases (peak with 0 fitness...)
+  when porting code to Java
+  '''
   if num_improved > 0:
     for i in range(0, len(neighbors)):
       neighbors_improved[neighbors[i]] = float(neighbors_improved[neighbors[i]])/num_improved
@@ -118,7 +121,7 @@ def calc_FA_probs(neighbors, node_id):
   return neighbors[best_index]
 
 def calc_boa_of_peak(peak):
-  que = queue.Queue()
+  que = Queue.Queue()
   basin = list()
   already_seen = list()
   neighbors = get_neighbors(peak, base)
@@ -150,7 +153,7 @@ max_fit = 0
 neighbor_probs = dict()
 all_fitnesses = list()
 peaks = list()
-boa_peak_sizes = dict()
+boas = dict()
 
 
 #=== Calculating First Ascent of FL ===#
@@ -175,9 +178,12 @@ for i in range(0,num_points):
 
 for peak in peaks:
   basin = calc_boa_of_peak(peak)
+  boas[peak] = basin
 
 #=== Output of First Ascent Network edge probabilities ===#
-
+'''Break down what's happening here to find edge cases (peak with 0 fitness...)
+when porting code to Java
+'''
 for node_id in neighbor_probs:
   for neighbor_id in neighbor_probs[node_id]:
     if neighbor_probs[node_id][neighbor_id] > 0:
@@ -191,21 +197,10 @@ for fitness in all_fitnesses:
 for peak in peaks:
   peaks_write.write(str(peak) + "\n")
 
-#for boa_peak in boa_peak_sizes:
+
+for boa_peak in boas:
+  boa_peaks_write.write(str(boa_peak) + ";" + str(boas[boa_peak]) + ";" + str(len(boas[boa_peak])) + "\n")
   
-'''
-#compile counts for boa sizes
-for i in range(0, len(boa_uf)):
-  if root(i) in boa_sizes:
-    boa_sizes[root(i)] += 1
-  else:
-    boa_sizes[root(i)] = 1
-
-for i in range(0, len(boa_uf)):
-  boa_peaks_write.write(str(i) + "," + str(root(i)) + "," + str(boa_sizes[root(i)]) +"\n")
-#  print(str(i) + " has root: " + str(root(i)))
-'''
-
 
 #Finishing output
 print("max num is: " + str(max_num))
