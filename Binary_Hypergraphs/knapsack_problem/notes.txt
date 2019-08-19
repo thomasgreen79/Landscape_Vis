@@ -1,0 +1,9 @@
+The first trial for producing a SAN from a GA search did not do a very good job.
+	-The connections in the network are any generated mutations from a parent population,
+	so the results are not really related to the SAN, even if the general trend is
+	toward the optima
+
+	-An improvement would be to keep the connections between the individuals that are selected
+	in the current population after every generation and their parents
+
+	-Could still do even more to favor steepest ascent...
